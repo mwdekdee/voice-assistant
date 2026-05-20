@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Generate Icons</title>
+</head>
+<body>
+<canvas id="canvas192" width="192" height="192"></canvas>
+<canvas id="canvas512" width="512" height="512"></canvas>
+<script>
+function drawIcon(canvas, size) {
+  const ctx = canvas.getContext('2d');
+  
+  // Background
+  ctx.fillStyle = '#4dabf7';
+  ctx.fillRect(0, 0, size, size);
+  
+  // Microphone icon
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  // Mic body
+  const centerX = size / 2;
+  const centerY = size / 2 - size * 0.05;
+  const micWidth = size * 0.18;
+  const micHeight = size * 0.25;
+  ctx.roundRect(centerX - micWidth/2, centerY - micHeight/2, micWidth, micHeight, micWidth/2);
+  ctx.fill();
+  
+  // Mic stand
+  ctx.beginPath();
+  ctx.arc(centerX, centerY + micHeight/2 + size * 0.08, size * 0.12, Math.PI, 0, false);
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = size * 0.04;
+  ctx.stroke();
+  
+  // Mic base
+  ctx.beginPath();
+  ctx.moveTo(centerX - size * 0.08, centerY + micHeight/2 + size * 0.2);
+  ctx.lineTo(centerX + size * 0.08, centerY + micHeight/2 + size * 0.2);
+  ctx.stroke();
+}
+
+drawIcon(document.getElementById('canvas192'), 192);
+drawIcon(document.getElementById('canvas512'), 512);
+
+console.log('Icons generated. Right-click to save as PNG.');
+</script>
+</body>
+</html>

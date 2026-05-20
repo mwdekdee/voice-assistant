@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="เลขาส่วนตัว">
+<title>เลขาส่วนตัว - Voice Assistant</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root {
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f8f9fa;
+  --color-background-tertiary: #f1f3f5;
+  --color-background-info: #e7f5ff;
+  --color-background-success: #ebfbee;
+  --color-background-warning: #fff9db;
+  --color-background-danger: #ffe5e5;
+  
+  --color-text-primary: #212529;
+  --color-text-secondary: #868e96;
+  --color-text-tertiary: #adb5bd;
+  --color-text-info: #0c8599;
+  --color-text-success: #2f9e44;
+  --color-text-warning: #f08c00;
+  --color-text-danger: #e03131;
+  
+  --color-border-primary: rgba(0,0,0,0.4);
+  --color-border-secondary: rgba(0,0,0,0.3);
+  --color-border-tertiary: rgba(0,0,0,0.15);
+  --color-border-info: #74c0fc;
+  
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background-primary: #25262b;
+    --color-background-secondary: #1a1b1e;
+    --color-background-tertiary: #141517;
+    --color-background-info: #1e3a52;
+    --color-background-success: #1b3d2a;
+    --color-background-warning: #3d3420;
+    --color-background-danger: #3d2020;
+    
+    --color-text-primary: #c1c2c5;
+    --color-text-secondary: #909296;
+    --color-text-tertiary: #5c5f66;
+    --color-text-info: #66d9e8;
+    --color-text-success: #8ce99a;
+    --color-text-warning: #ffd43b;
+    --color-text-danger: #ff6b6b;
+    
+    --color-border-primary: rgba(255,255,255,0.4);
+    --color-border-secondary: rgba(255,255,255,0.3);
+    --color-border-tertiary: rgba(255,255,255,0.15);
+  }
+}
+
+* { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body { 
+  font-family: var(--font-sans);
+  background: var(--color-background-tertiary);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+  min-height: 100vh;
+}
+
+.install-banner {
+  background: var(--color-background-info);
+  color: var(--color-text-info);
+  padding: 12px 16px;
+  border-radius: var(--border-radius-lg);
+  margin-bottom: 1rem;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.install-banner.show { display: flex; }
+
+.install-banner button {
+  margin-left: auto;
+  background: var(--color-text-info);
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: var(--border-radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.header p {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.permission-card {
+  background: var(--color-background-warning);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  display: none;
+}
+
+.permission-card.show { display: block; }
+
+.permission-card h3 {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--color-text-warning);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.permission-card p {
+  font-size: 14px;
+  color: var(--color-text-primary);
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.permission-card button {
+  width: 100%;
+  background: var(--color-text-warning);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: var(--border-radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.mic-section {
+  text-align: center;
+  padding: 2rem 1rem 1.5rem;
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: 1rem;
+}
+
+.mic-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-background-info);
+  color: var(--color-text-info);
+  font-size: 36px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.mic-btn:active { transform: scale(0.95); }
+.mic-btn.listening {
+  background: var(--color-background-danger);
+  color: var(--color-text-danger);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+.status-text {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  min-height: 20px;
+}
+
+.transcript {
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  padding: 1rem;
+  margin-top: 1rem;
+  display: none;
+}
+
+.transcript.show { display: block; }
+
+.transcript-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.setup-controls {
+  display: none;
+  gap: 8px;
+  flex-direction: column;
+}
+
+.setup-controls.show { display: flex; }
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.control-group label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.control-row {
+  display: flex;
+  gap: 8px;
+}
+
+.control-row input,
+.control-row select {
+  flex: 1;
+}
+
+input, select, button {
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+input[type="date"],
+input[type="time"],
+select {
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  padding: 8px 12px;
+  color: var(--color-text-primary);
+  height: 36px;
+}
+
+button {
+  background: transparent;
+  border: 0.5px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 8px 16px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  height: 36px;
+}
+
+button:active { transform: scale(0.98); }
+
+.btn-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn-group button { flex: 1; }
+
+.btn-primary {
+  background: var(--color-background-info);
+  color: var(--color-text-info);
+  font-weight: 500;
+  border-color: var(--color-border-info);
+}
+
+.tasks-section {
+  margin-top: 1.5rem;
+}
+
+.section-header {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.task-card {
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.task-card:active {
+  border-color: var(--color-border-secondary);
+}
+
+.task-card.done {
+  opacity: 0.5;
+}
+
+.task-card.done .task-title {
+  text-decoration: line-through;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.task-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  flex: 1;
+  line-height: 1.4;
+}
+
+.task-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn:active {
+  color: var(--color-text-primary);
+  background: var(--color-background-secondary);
+}
+
+.task-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text-secondary);
+}
+
+.meta-item i {
+  font-size: 14px;
+}
+
+.category-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: var(--border-radius-md);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.category-work {
+  background: var(--color-background-info);
+  color: var(--color-text-info);
+}
+
+.category-personal {
+  background: var(--color-background-success);
+  color: var(--color-text-success);
+}
+
+.category-urgent {
+  background: var(--color-background-danger);
+  color: var(--color-text-danger);
+}
+
+.category-business {
+  background: var(--color-background-warning);
+  color: var(--color-text-warning);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--color-text-tertiary);
+  font-size: 14px;
+}
+
+.empty-state i {
+  font-size: 48px;
+  opacity: 0.3;
+  display: block;
+  margin-bottom: 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="install-banner" id="installBanner">
+    <i class="ti ti-download"></i>
+    <span>ติดตั้งเป็นแอปเพื่อใช้งานสะดวกขึ้น</span>
+    <button onclick="installApp()">ติดตั้ง</button>
+  </div>
+
+  <div class="permission-card" id="notificationPermission">
+    <h3>
+      <i class="ti ti-bell"></i>
+      ขออนุญาตแจ้งเตือน
+    </h3>
+    <p>เพื่อให้แอปสามารถเตือนความจำคุณได้แม้ไม่ได้เปิดแอปค้างไว้ กรุณาอนุญาตการแจ้งเตือน</p>
+    <button onclick="requestNotificationPermission()">อนุญาต</button>
+  </div>
+
+  <div class="header">
+    <h1>🎙️ เลขาส่วนตัว</h1>
+    <p>พูดสั่งงาน ตั้งเวลา รับแจ้งเตือน</p>
+  </div>
+
+  <div class="mic-section">
+    <button class="mic-btn" id="micBtn" aria-label="กดเพื่อพูด">
+      <i class="ti ti-microphone"></i>
+    </button>
+    <div class="status-text" id="statusText">กดปุ่มแล้วพูดเลย</div>
+    
+    <div class="transcript" id="transcript">
+      <div class="transcript-text" id="transcriptText"></div>
+      
+      <div class="setup-controls" id="setupControls">
+        <div class="control-group">
+          <label>วันที่และเวลา</label>
+          <div class="control-row">
+            <input type="date" id="dateInput" />
+            <input type="time" id="timeInput" />
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <label>หมวดหมู่</label>
+          <select id="categoryInput">
+            <option value="work">งาน</option>
+            <option value="personal">ส่วนตัว</option>
+            <option value="business">ธุรกิจ</option>
+            <option value="urgent">เร่งด่วน</option>
+          </select>
+        </div>
+        
+        <div class="control-group">
+          <label>เตือนล่วงหน้า</label>
+          <select id="reminderInput">
+            <option value="0">ตรงเวลา</option>
+            <option value="5">5 นาทีก่อน</option>
+            <option value="15">15 นาทีก่อน</option>
+            <option value="30">30 นาทีก่อน</option>
+            <option value="60">1 ชั่วโมงก่อน</option>
+            <option value="1440">1 วันก่อน</option>
+          </select>
+        </div>
+        
+        <div class="btn-group">
+          <button onclick="cancelTask()">ยกเลิก</button>
+          <button class="btn-primary" onclick="saveTask()">บันทึก</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tasks-section">
+    <div class="section-header">งานทั้งหมด</div>
+    <div class="task-list" id="taskList">
+      <div class="empty-state">
+        <i class="ti ti-clipboard"></i>
+        ยังไม่มีงาน กดไมค์เพื่อเพิ่มงานใหม่
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let deferredPrompt;
+let recognition;
+let currentTranscript = '';
+let tasks = [];
+let notificationPermissionGranted = false;
+
+// Check notification permission on load
+window.addEventListener('load', () => {
+  checkNotificationPermission();
+  loadTasks();
+  initSpeechRecognition();
+  
+  // Check if already installed
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    console.log('Running as installed PWA');
+  }
+});
+
+// PWA Install prompt
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('show');
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+        document.getElementById('installBanner').classList.remove('show');
+      }
+      deferredPrompt = null;
+    });
+  }
+}
+
+// Service Worker registration
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(registration => {
+      console.log('Service Worker registered:', registration);
+    })
+    .catch(error => {
+      console.log('Service Worker registration failed:', error);
+    });
+}
+
+// Notification permission
+function checkNotificationPermission() {
+  if ('Notification' in window) {
+    if (Notification.permission === 'granted') {
+      notificationPermissionGranted = true;
+    } else if (Notification.permission !== 'denied') {
+      document.getElementById('notificationPermission').classList.add('show');
+    }
+  }
+}
+
+function requestNotificationPermission() {
+  if ('Notification' in window) {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        notificationPermissionGranted = true;
+        document.getElementById('notificationPermission').classList.remove('show');
+        showTestNotification();
+      }
+    });
+  }
+}
+
+function showTestNotification() {
+  if (notificationPermissionGranted && 'serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(registration => {
+      registration.showNotification('เลขาส่วนตัว', {
+        body: 'พร้อมแจ้งเตือนคุณแล้ว!',
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
+        vibrate: [200, 100, 200],
+        tag: 'test-notification'
+      });
+    });
+  }
+}
+
+// Load tasks from localStorage
+function loadTasks() {
+  const saved = localStorage.getItem('tasks');
+  if (saved) {
+    tasks = JSON.parse(saved);
+    renderTasks();
+    scheduleNotifications();
+  }
+}
+
+// Save tasks to localStorage
+function saveTasks() {
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+  scheduleNotifications();
+}
+
+// Speech recognition
+function initSpeechRecognition() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    document.getElementById('statusText').textContent = 'เบราว์เซอร์ไม่รองรับการรับเสียง';
+    document.getElementById('micBtn').disabled = true;
+    return;
+  }
+  
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.lang = 'th-TH';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  
+  recognition.onstart = function() {
+    document.getElementById('micBtn').classList.add('listening');
+    document.getElementById('statusText').textContent = 'กำลังฟัง...';
+  };
+  
+  recognition.onresult = function(event) {
+    currentTranscript = event.results[0][0].transcript;
+    document.getElementById('transcriptText').textContent = currentTranscript;
+    document.getElementById('transcript').classList.add('show');
+    document.getElementById('setupControls').classList.add('show');
+    
+    const now = new Date();
+    document.getElementById('dateInput').valueAsDate = now;
+    document.getElementById('timeInput').value = now.toTimeString().slice(0, 5);
+  };
+  
+  recognition.onerror = function(event) {
+    document.getElementById('statusText').textContent = 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง';
+    document.getElementById('micBtn').classList.remove('listening');
+  };
+  
+  recognition.onend = function() {
+    document.getElementById('micBtn').classList.remove('listening');
+    if (!currentTranscript) {
+      document.getElementById('statusText').textContent = 'ไม่ได้ยินเสียง กดลองใหม่อีกครั้ง';
+    } else {
+      document.getElementById('statusText').textContent = 'ตั้งค่าเพิ่มเติมด้านล่าง';
+    }
+  };
+}
+
+document.getElementById('micBtn').addEventListener('click', function() {
+  if (recognition) {
+    currentTranscript = '';
+    document.getElementById('transcript').classList.remove('show');
+    document.getElementById('setupControls').classList.remove('show');
+    recognition.start();
+  }
+});
+
+function cancelTask() {
+  currentTranscript = '';
+  document.getElementById('transcript').classList.remove('show');
+  document.getElementById('setupControls').classList.remove('show');
+  document.getElementById('statusText').textContent = 'กดปุ่มแล้วพูดเลย';
+}
+
+function saveTask() {
+  const date = document.getElementById('dateInput').value;
+  const time = document.getElementById('timeInput').value;
+  const category = document.getElementById('categoryInput').value;
+  const reminder = parseInt(document.getElementById('reminderInput').value);
+  
+  if (!currentTranscript || !date || !time) {
+    alert('กรุณากรอกข้อมูลให้ครบ');
+    return;
+  }
+  
+  const datetime = new Date(`${date}T${time}`);
+  const reminderTime = new Date(datetime.getTime() - reminder * 60000);
+  
+  const task = {
+    id: Date.now(),
+    text: currentTranscript,
+    category: category,
+    datetime: datetime.getTime(),
+    reminderTime: reminderTime.getTime(),
+    done: false,
+    notified: false
+  };
+  
+  tasks.push(task);
+  saveTasks();
+  renderTasks();
+  cancelTask();
+}
+
+function renderTasks() {
+  const taskList = document.getElementById('taskList');
+  
+  if (tasks.length === 0) {
+    taskList.innerHTML = `
+      <div class="empty-state">
+        <i class="ti ti-clipboard"></i>
+        ยังไม่มีงาน กดไมค์เพื่อเพิ่มงานใหม่
+      </div>
+    `;
+    return;
+  }
+  
+  const sortedTasks = [...tasks].sort((a, b) => a.datetime - b.datetime);
+  
+  taskList.innerHTML = sortedTasks.map(task => {
+    const datetime = new Date(task.datetime);
+    const dateStr = datetime.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+    const timeStr = datetime.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+    
+    const categoryLabels = {
+      work: 'งาน',
+      personal: 'ส่วนตัว',
+      business: 'ธุรกิจ',
+      urgent: 'เร่งด่วน'
+    };
+    
+    return `
+      <div class="task-card ${task.done ? 'done' : ''}" onclick="toggleTask(${task.id})">
+        <div class="task-header">
+          <div class="task-title">${task.text}</div>
+          <div class="task-actions">
+            <button class="icon-btn" onclick="event.stopPropagation(); deleteTask(${task.id});" aria-label="ลบ">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+        </div>
+        <div class="task-meta">
+          <span class="category-badge category-${task.category}">${categoryLabels[task.category]}</span>
+          <span class="meta-item">
+            <i class="ti ti-calendar"></i>
+            ${dateStr}
+          </span>
+          <span class="meta-item">
+            <i class="ti ti-clock"></i>
+            ${timeStr}
+          </span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (task) {
+    task.done = !task.done;
+    saveTasks();
+    renderTasks();
+  }
+}
+
+function deleteTask(id) {
+  if (confirm('ต้องการลบงานนี้?')) {
+    tasks = tasks.filter(t => t.id !== id);
+    saveTasks();
+    renderTasks();
+  }
+}
+
+// Schedule notifications
+function scheduleNotifications() {
+  if (!notificationPermissionGranted || !('serviceWorker' in navigator)) {
+    return;
+  }
+  
+  tasks.forEach(task => {
+    if (!task.done && !task.notified) {
+      const now = Date.now();
+      const timeUntil = task.reminderTime - now;
+      
+      if (timeUntil > 0 && timeUntil < 86400000) { // Within 24 hours
+        setTimeout(() => {
+          showTaskNotification(task);
+        }, timeUntil);
+      } else if (timeUntil <= 0 && timeUntil > -300000) { // Past due within 5 min
+        showTaskNotification(task);
+      }
+    }
+  });
+}
+
+function showTaskNotification(task) {
+  if (notificationPermissionGranted && 'serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(registration => {
+      const datetime = new Date(task.datetime);
+      const timeStr = datetime.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+      
+      registration.showNotification('⏰ เตือนความจำ', {
+        body: `${task.text}\nเวลา: ${timeStr}`,
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
+        vibrate: [200, 100, 200, 100, 200],
+        tag: `task-${task.id}`,
+        requireInteraction: true,
+        actions: [
+          { action: 'complete', title: 'เสร็จแล้ว' },
+          { action: 'snooze', title: 'เลื่อน 15 นาที' }
+        ],
+        data: { taskId: task.id }
+      });
+      
+      task.notified = true;
+      saveTasks();
+    });
+  }
+}
+
+// Handle notification clicks
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data.action === 'complete') {
+      const task = tasks.find(t => t.id === event.data.taskId);
+      if (task) {
+        task.done = true;
+        saveTasks();
+        renderTasks();
+      }
+    } else if (event.data.action === 'snooze') {
+      const task = tasks.find(t => t.id === event.data.taskId);
+      if (task) {
+        task.reminderTime = Date.now() + 15 * 60000;
+        task.notified = false;
+        saveTasks();
+        scheduleNotifications();
+      }
+    }
+  });
+}
+</script>
+
+</body>
+</html>
